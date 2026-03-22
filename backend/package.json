@@ -12,6 +12,7 @@
   "type": "commonjs",
   "dependencies": {
     "activedirectory2": "^2.2.0",
+    "axios": "^1.13.6",
     "body-parser": "^2.2.2",
     "child_process": "^1.0.2",
     "cors": "^2.8.6",
