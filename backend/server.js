@@ -20,7 +20,12 @@ app.use(session({
 app.get('/', (req, res) => { res.send('Server is working'); });
 
 const runPSScript = (scriptName, callback) => {
-    const scriptPath = path.join(__dirname, '..', 'scripts', scriptName);
+    // Check if scripts is in the same folder (Docker) or parent (Local)
+    let scriptsDir = path.join(__dirname, 'scripts');
+    if (!require('fs').existsSync(scriptsDir)) {
+        scriptsDir = path.join(__dirname, '..', 'scripts');
+    }
+    const scriptPath = path.join(scriptsDir, scriptName);
     const serverIP = (process.env.AD_URL || '').replace('ldap://', '').replace(/:\d+$/, '');
 
     // Construct command with arguments
@@ -54,7 +59,11 @@ app.post('/api/login', (req, res) => {
     if (!username || !password) return res.status(400).json({ error: 'Username and password required.' });
 
     console.log(`Authenticating user: ${username}...`);
-    const scriptPath = path.join(__dirname, '..', 'scripts', 'authenticateUser.ps1');
+    let scriptsDir = path.join(__dirname, 'scripts');
+    if (!require('fs').existsSync(scriptsDir)) {
+        scriptsDir = path.join(__dirname, '..', 'scripts');
+    }
+    const scriptPath = path.join(scriptsDir, 'authenticateUser.ps1');
     const serverIP = (process.env.AD_URL || '').replace('ldap://', '').replace(/:\d+$/, '');
 
     // IMPORTANT: Make sure to properly escape credentials in a real prod environment
@@ -105,7 +114,11 @@ app.get('/api/dashboard', (req, res) => {
 app.get('/api/teams', (req, res) => {
     if (!req.session.isAdmin) return res.status(401).json({ error: 'Unauthorized access.' });
 
-    const scriptPath = path.join(__dirname, '..', 'scripts', 'getTeams.ps1');
+    let scriptsDir = path.join(__dirname, 'scripts');
+    if (!require('fs').existsSync(scriptsDir)) {
+        scriptsDir = path.join(__dirname, '..', 'scripts');
+    }
+    const scriptPath = path.join(scriptsDir, 'getTeams.ps1');
     const serverIP = (process.env.AD_URL || '').replace('ldap://', '').replace(/:\d+$/, '');
 
     const command = `powershell.exe -ExecutionPolicy Bypass -File "${scriptPath}" `
@@ -136,7 +149,11 @@ app.post('/api/custom-report', (req, res) => {
         return res.status(400).json({ error: 'fromDate and toDate are required for this report type.' });
     }
 
-    const scriptPath = path.join(__dirname, '..', 'scripts', 'customReport.ps1');
+    let scriptsDir = path.join(__dirname, 'scripts');
+    if (!require('fs').existsSync(scriptsDir)) {
+        scriptsDir = path.join(__dirname, '..', 'scripts');
+    }
+    const scriptPath = path.join(scriptsDir, 'customReport.ps1');
     const serverIP = (process.env.AD_URL || '').replace('ldap://', '').replace(/:\d+$/, '');
     const days = expireDays ? parseInt(expireDays) : 5;
     const inactDays = inactiveDays ? parseInt(inactiveDays) : 0;

@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ad-backend
+    volumes:
+      - ./scripts:/app/scripts
+      - ./backend/.env:/app/.env
+    # network_mode: host # Uncomment for direct Linux performance
+    ports:
+      - "5000:5000"
+    restart: always
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: ad-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    restart: always
+
+networks:
+  default:
+    name: ad-tracker-network
